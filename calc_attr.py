@@ -3,22 +3,23 @@ import shapely.wkt
 import networkx as nx
 from math import comb
 import dotenv
+import os
 
 dotenv.load_dotenv()
 
 db_params = {
-    'dbname': dotenv.get('DB_NAME'),
-    'user': dotenv.get('DB_USER'),
-    'password': dotenv.get('DB_PASS'),
-    'host': dotenv.get('DB_HOST'),
-    'port': dotenv.get('DB_PORT'),
+    'dbname': os.getenv('DB_NAME'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASS'),
+    'host': os.getenv('DB_HOST'),
+    'port': os.getenv('DB_PORT'),
 }
 
 conn = psycopg2.connect(**db_params)
 cursor = conn.cursor()
 
 query = f"""
-    SELECT ogc_fid, source, target, ST_AsText(wkb_geometry), reliability FROM {dotenv.get('GEOM_TABLE')};
+    SELECT ogc_fid, source, target, ST_AsText(wkb_geometry), reliability FROM {os.getenv('GEOM_TABLE')};
 """
 
 cursor.execute(query)

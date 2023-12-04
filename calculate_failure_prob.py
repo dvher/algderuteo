@@ -4,6 +4,7 @@ import shapely.wkt
 import networkx as nx
 import math
 import dotenv
+import os
 
 dotenv.load_dotenv()
 
@@ -15,18 +16,18 @@ def seismic_reliability(distance, decay_factor=0.1):
     return reliability
 
 db_params = {
-    'dbname': dotenv.get('DB_NAME'),
-    'user': dotenv.get('DB_USER'),
-    'password': dotenv.get('DB_PASS'),
-    'host': dotenv.get('DB_HOST'),
-    'port': dotenv.get('DB_PORT'),
+    'dbname': os.getenv('DB_NAME'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASS'),
+    'host': os.getenv('DB_HOST'),
+    'port': os.getenv('DB_PORT'),
 }
 
 conn = psycopg2.connect(**db_params)
 cursor = conn.cursor()
 
 query = f"""
-    SELECT ogc_fid, source, target, ST_AsText(wkb_geometry) FROM {dotenv.get('GEOM_TABLE')};
+    SELECT ogc_fid, source, target, ST_AsText(wkb_geometry) FROM {os.getenv('GEOM_TABLE')};
 """
 
 cursor.execute(query)
@@ -68,7 +69,7 @@ for edge in graph.edges(data=True):
     edge_id = properties['id']
     probability_of_failure = properties['probability_of_failure']
     query = f"""
-        UPDATE {dotenv.get('GEOM_TABLE')}
+        UPDATE {os.getenv('GEOM_TABLE')}
         SET reliability = {probability_of_failure}
         WHERE ogc_fid = {edge_id};
     """
