@@ -31,7 +31,7 @@ for row in cursor.fetchall():
     edge_id, source, target, geom_text, reliability = row
     
     geom = shapely.wkt.loads(geom_text)
-    graph.add_edge(source, target, id=edge_id, reliability=reliability)
+    graph.add_edge(source, target, id=edge_id, failure_probability=1-reliability)
 
 cursor.close()
 conn.close()
@@ -44,8 +44,7 @@ for source in graph.nodes():
         if source != target:
             try:
                 # Given the reliability of each edge, calculate the reliability of the path
-                reliability = nx.shortest_path_length(graph, source=source, target=target, weight='reliability')
-                failure_probability = 1 - reliability
+                failure_probability = nx.shortest_path_length(graph, source=source, target=target, weight='failure_probability')
                 total_failure_probability += failure_probability
             except nx.NetworkXNoPath:
                 pass
@@ -53,7 +52,5 @@ for source in graph.nodes():
 if num_pairs > 0:
     attr = total_failure_probability / num_pairs
     print(f"Average Two-Terminal Reliability (ATTR): {attr}")
-    print(f"Number of pairs of terminals: {num_pairs}")
-    print(f"Total failure probability: {total_failure_probability}")
 else:
     print("No pairs of terminals found for reliability calculation.")
