@@ -1,0 +1,8 @@
+.env
+Respuesta_T5610/
+t2adr/
+db_dump.*
+db.*
+PortalTransparencia_Yafun.zip
+.vscode/
+*.geojson
